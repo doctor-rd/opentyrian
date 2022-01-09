@@ -457,12 +457,13 @@ ulong JE_getCost( JE_byte itemType, JE_word itemNum )
 	case 3:
 	case 4:
 		cost = weaponPort[itemNum].cost;
+		{
+			const uint port = itemType - 3;
+			const item_power = player[0].items.weapon[port].power - 1;
 
-		const uint port = itemType - 3,
-		           item_power = player[0].items.weapon[port].power - 1;
-
-		downgradeCost = weapon_upgrade_cost(cost, item_power);
-		upgradeCost = weapon_upgrade_cost(cost, item_power + 1);
+			downgradeCost = weapon_upgrade_cost(cost, item_power);
+			upgradeCost = weapon_upgrade_cost(cost, item_power + 1);
+		}
 		break;
 	case 5:
 		cost = shields[itemNum].cost;
@@ -709,16 +710,18 @@ JE_longint JE_getValue( JE_byte itemType, JE_word itemNum )
 		value = ships[itemNum].cost;
 		break;
 	case 3:
-	case 4:;
-		const long base_value = weaponPort[itemNum].cost;
+	case 4:
+		{
+			const long base_value = weaponPort[itemNum].cost;
 
-		// if two-player, use first player's front and second player's rear weapon
-		const uint port = itemType - 3;
-		const uint item_power = player[twoPlayerMode ? port : 0].items.weapon[port].power - 1;
+			// if two-player, use first player's front and second player's rear weapon
+			const uint port = itemType - 3;
+			const uint item_power = player[twoPlayerMode ? port : 0].items.weapon[port].power - 1;
 
-		value = base_value;
-		for (unsigned int i = 1; i <= item_power; ++i)
-			value += weapon_upgrade_cost(base_value, i);
+			value = base_value;
+			for (unsigned int i = 1; i <= item_power; ++i)
+				value += weapon_upgrade_cost(base_value, i);
+		}
 		break;
 	case 5:
 		value = shields[itemNum].cost;
