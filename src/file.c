@@ -173,6 +173,34 @@ static void determineUserDirPath(void)
 		userDirPathLen = 0;
 	}
 
+	char *basePath = SDL_GetBasePath();
+	if (basePath != NULL)
+	{
+		// If a certain file exists in the base path, store user files there.
+		const char *const filename = "opentyrian.cfg";
+
+		size_t filePathSize = strlen(basePath) + strlen(filename) + 1;
+		char *filePath = malloc(filePathSize);
+		snprintf(filePath, filePathSize, "%s%s", basePath, filename);
+
+		bool portable = fileExists(filePath);
+		
+		free(filePath);
+
+		if (portable)
+		{
+			userDirPathLen = strlen(basePath) - 1;  // Trim trailing slash.
+			size_t userDirPathSize = userDirPathLen + 1;
+			userDirPath = malloc(userDirPathSize);
+			snprintf(userDirPath, userDirPathSize, "%s", basePath);
+		}
+
+		SDL_free(basePath);
+
+		if (portable)
+			return;
+	}
+
 #ifdef TARGET_WIN32
 	const char *appData = getenv("APPDATA");
 	if (appData != NULL)
